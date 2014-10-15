@@ -61,20 +61,26 @@ func (self *FCSFile) readTextSegment(f *os.File) {
 	for i := 1; i < len(pairs); i = i + 2 {
 
 		x, y := pairs[i-1], pairs[i]
-		self.removeChar(&x) //Take away any $ or spaces
+		self.removeChar(&x, true)  //Take away any $ or spaces
+		self.removeChar(&y, false) //Trims values of space characters
 		self.txtDict[x] = y
 
 	}
 
-	fmt.Println(self.txtDict)
+	fmt.Println(self.txtDict["EXPERIMENT_NAME"])
 
 }
 
-//Removes $ (replaced with "") and spaces from string (replaced with "_")
-func (self *FCSFile) removeChar(s *string) {
+//Removes $ (replaced with "") and spaces from string (replaced with "_") for
+//only keys (key == true). All strings are Trimed
+func (self *FCSFile) removeChar(s *string, key bool) {
 
-	*s = strings.Replace(*s, "$", "", -1)
-	*s = strings.Replace(*s, " ", "_", -1)
+	if key == true {
+		*s = strings.Replace(*s, "$", "", -1)
+		*s = strings.Replace(*s, " ", "_", -1)
+	}
+
+	*s = strings.TrimSpace(*s)
 
 }
 
