@@ -4,6 +4,8 @@ import (
 	//"bytes"
 	"fmt"
 	"os"
+	"time"
+	//"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -22,13 +24,15 @@ type FCSFile struct {
 	txtStart int
 	txtEnd   int
 	txtDict  map[string]string
+	f        *os.File
 }
 
-func (self *FCSFile) initFCS(path string) {
+func (self *FCSFile) InitFCS(path string) {
 
 	//Open the binary FCS file for parsing by
 	//using byte offsets.
 	f, err := os.Open(path)
+	self.f = f
 	self.readTextSegment(f) //Populates txtDict with paramters from TEXT segment.
 	check(err)
 	defer f.Close()
@@ -68,7 +72,16 @@ func (self *FCSFile) readTextSegment(f *os.File) {
 
 	}
 
-	fmt.Println(self.txtDict["EXPERIMENT_NAME"])
+	//z, _ := filepath.Glob("./*.fcs")
+	//for k, v := range self.txtDict {
+
+	//	fmt.Println("Key: " + k)
+	//	fmt.Println(v)
+	//}
+
+	const shortForm = "2006-Jan-02"
+	t, _ := time.Parse(shortForm, "2013-FEB-03")
+	fmt.Println(t)
 
 }
 
@@ -97,9 +110,40 @@ func (self *FCSFile) readBytes(f *os.File, byteSize int64, offset int64) string 
 
 }
 
+/*****************************************************************************
+**   This is the END of the FCSFile defintion and methods.					**
+******************************************************************************/
+
+type FCSInfo struct {
+	oldFN   string //Numeric file names ex. 10203030202302.fcs
+	newFN   string //New Filename ex. EXP_Name_
+	srcPath string //Source Path - This is where the BDData file is located
+	desPath string //Destination Path - Where the recovered files will be placed
+	expName string //Name is experiment as read from TEXT segment of FCS
+	expDate string //Date of experiment as read from TEXT segment of FCS
+	expSrc  string //Specimen name as read from TEXT segment of FCS
+
+}
+
+func (self *FCSInfo) InitFCSInfo(fcs *FCSFile) {
+	self.expName = fcs.txtDict["EXPERIMENT_NAME"]
+	self.expDate = fcs.txtDict["DATE"]
+	self.expSrc = fcs.txtDict["SRC"]
+	self.newFN = fcs.txtDict["FIL"]
+	self.oldFN = fcs.f.Name()
+
+}
+func (self *FCSInfo) SetPath(src string, des string) {
+	self.srcPath = src
+	self.desPath = des
+
+}
+
 func main() {
 
-	newFile := FCSFile{}
-	newFile.initFCS("./test.fcs")
+	newFile := &FCSFile{}
+	newFile.InitFCS("test.fcs")
+	fileInfo := FCSInfo{}
+	fileInfo.InitFCSInfo(newFile)
 
 }
