@@ -1,14 +1,24 @@
 package main
 
 import (
-	//"bytes"
 	"fmt"
 	"os"
-	"time"
-	//"path/filepath"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
+
+const SEP = string(os.PathSeparator)
+
+func convertDate(date *string) {
+
+	const shortForm = "02-Jan-2006"
+	t, _ := time.Parse(shortForm, *date)
+	timeString := t.String()
+	*date = strings.Split(timeString, " ")[0]
+
+}
 
 // Reading files requires checking most calls for errors.
 // This helper will streamline our error checks below.
@@ -72,17 +82,6 @@ func (self *FCSFile) readTextSegment(f *os.File) {
 
 	}
 
-	//z, _ := filepath.Glob("./*.fcs")
-	//for k, v := range self.txtDict {
-
-	//	fmt.Println("Key: " + k)
-	//	fmt.Println(v)
-	//}
-
-	const shortForm = "2006-Jan-02"
-	t, _ := time.Parse(shortForm, "2013-FEB-03")
-	fmt.Println(t)
-
 }
 
 //Removes $ (replaced with "") and spaces from string (replaced with "_") for
@@ -115,35 +114,71 @@ func (self *FCSFile) readBytes(f *os.File, byteSize int64, offset int64) string 
 ******************************************************************************/
 
 type FCSInfo struct {
-	oldFN   string //Numeric file names ex. 10203030202302.fcs
-	newFN   string //New Filename ex. EXP_Name_
-	srcPath string //Source Path - This is where the BDData file is located
-	desPath string //Destination Path - Where the recovered files will be placed
-	expName string //Name is experiment as read from TEXT segment of FCS
-	expDate string //Date of experiment as read from TEXT segment of FCS
-	expSrc  string //Specimen name as read from TEXT segment of FCS
-
+	oldFN    string //Numeric file names ex. 10203030202302.fcs
+	newFN    string //New Filename ex. EXP_Name_
+	expName  string //Name is experiment as read from TEXT segment of FCS
+	expDate  string //Date of experiment as read from TEXT segment of FCS
+	expSrc   string //Specimen name as read from TEXT segment of FCS
+	expUser  string //Export username (person who conducted the experiment)
+	filePath string //Where the file should be located
 }
 
 func (self *FCSInfo) InitFCSInfo(fcs *FCSFile) {
+
 	self.expName = fcs.txtDict["EXPERIMENT_NAME"]
+
 	self.expDate = fcs.txtDict["DATE"]
+	convertDate(&self.expDate) //Coverts date to more manigable string format
+
 	self.expSrc = fcs.txtDict["SRC"]
-	self.newFN = fcs.txtDict["FIL"]
+	self.expUser = fcs.txtDict["EXPORT_USER_NAME"]
+	self.newFN = self.expName + "_" + self.expSrc
 	self.oldFN = fcs.f.Name()
 
+	self.expName = self.expDate + " " + self.expName
+	self.filePath = SEP + self.expUser + SEP + self.expName + SEP + self.expSrc
+
+	fmt.Println(self.expDate)
+
 }
-func (self *FCSInfo) SetPath(src string, des string) {
+
+type Path struct {
+	srcPath string //Source Path - This is where the BDData file is located
+	desPath string //Destination Path - Where the recovered files will be placed
+}
+
+func (self *Path) SetPath(src string, des string) {
 	self.srcPath = src
 	self.desPath = des
+}
 
+func (self *Path) GlobIt() []string {
+	os.Chdir(self.srcPath)
+	f, err := filepath.Glob("*.fcs")
+	check(err)
+
+	return f
+
+}
+
+func (self *Path) RenameMove(fcsInfo *FCSInfo) {
+	os.MkdirAll(self.desPath+fcsInfo.filePath, 0777)
 }
 
 func main() {
 
+	paths := &Path{}
+	paths.SetPath("/Users/sivabalanmanivannan/Desktop/BDData", "/Users/sivabalanmanivannan/TempData")
+	files := paths.GlobIt()
+
 	newFile := &FCSFile{}
-	newFile.InitFCS("test.fcs")
-	fileInfo := FCSInfo{}
-	fileInfo.InitFCSInfo(newFile)
+	fileInfo := &FCSInfo{}
+
+	for _, fileName := range files {
+
+		newFile.InitFCS(fileName)
+		fileInfo.InitFCSInfo(newFile)
+		paths.RenameMove(fileInfo)
+	}
 
 }
