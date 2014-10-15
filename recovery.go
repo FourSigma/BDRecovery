@@ -13,6 +13,7 @@ import (
 func check(e error) {
 	if e != nil {
 		panic(e)
+
 	}
 }
 
@@ -20,19 +21,26 @@ type FCSFile struct {
 	version  string
 	txtStart int
 	txtEnd   int
-	filename string
 	txtDict  map[string]string
 }
 
-func (self *FCSFile) initFCS(fn string) {
+func (self *FCSFile) initFCS(path string) {
 
 	//Open the binary FCS file for parsing by
 	//using byte offsets.
-	self.filename = fn
-	f, err := os.Open("./" + self.filename)
+	f, err := os.Open(path)
+	self.readTextSegment(f) //Populates txtDict with paramters from TEXT segment.
 	check(err)
 	defer f.Close()
 
+}
+
+//Reads the TEXT segment of the FCS binary and creates
+//a dictionary map of the key-value pairs in that
+//segment
+func (self *FCSFile) readTextSegment(f *os.File) {
+
+	//Offsets based on FCS specs
 	self.version = self.readBytes(f, 6, 0)
 	tmp := self.readBytes(f, 8, 10)
 	self.txtStart, _ = strconv.Atoi(tmp)
@@ -62,7 +70,7 @@ func (self *FCSFile) initFCS(fn string) {
 
 }
 
-//Removes $ and spaces from string (replaced with "_")
+//Removes $ (replaced with "") and spaces from string (replaced with "_")
 func (self *FCSFile) removeChar(s *string) {
 
 	*s = strings.Replace(*s, "$", "", -1)
@@ -85,6 +93,6 @@ func (self *FCSFile) readBytes(f *os.File, byteSize int64, offset int64) string 
 func main() {
 
 	newFile := FCSFile{}
-	newFile.initFCS("test.fcs")
+	newFile.initFCS("./test.fcs")
 
 }
