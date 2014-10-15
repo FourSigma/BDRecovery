@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -11,6 +12,16 @@ import (
 
 const SEP = string(os.PathSeparator)
 
+// Reading files requires checking most calls for errors.
+// This helper will streamline our error checks below.
+func check(e error) {
+	if e != nil {
+		panic(e)
+
+	}
+}
+
+//Converts date into a more convient format
 func convertDate(date *string) {
 
 	const shortForm = "02-Jan-2006"
@@ -20,13 +31,25 @@ func convertDate(date *string) {
 
 }
 
-// Reading files requires checking most calls for errors.
-// This helper will streamline our error checks below.
-func check(e error) {
-	if e != nil {
-		panic(e)
+//Copy files
 
+func cp(src, dst string) error {
+	s, err := os.Open(src)
+	if err != nil {
+		return err
 	}
+	// no need to check errors on read only file, we already got everything
+	// we need from the filesystem, so nothing can go wrong now.
+	defer s.Close()
+	d, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(d, s); err != nil {
+		d.Close()
+		return err
+	}
+	return d.Close()
 }
 
 type FCSFile struct {
@@ -119,6 +142,7 @@ type FCSInfo struct {
 	expName  string //Name is experiment as read from TEXT segment of FCS
 	expDate  string //Date of experiment as read from TEXT segment of FCS
 	expSrc   string //Specimen name as read from TEXT segment of FCS
+	expTube  string //Experimental Tube
 	expUser  string //Export username (person who conducted the experiment)
 	filePath string //Where the file should be located
 }
@@ -126,19 +150,27 @@ type FCSInfo struct {
 func (self *FCSInfo) InitFCSInfo(fcs *FCSFile) {
 
 	self.expName = fcs.txtDict["EXPERIMENT_NAME"]
-
-	self.expDate = fcs.txtDict["DATE"]
-	convertDate(&self.expDate) //Coverts date to more manigable string format
-
+	self.expTube = fcs.txtDict["TUBE_NAME"]
+	self.oldFN = fcs.f.Name()
 	self.expSrc = fcs.txtDict["SRC"]
 	self.expUser = fcs.txtDict["EXPORT_USER_NAME"]
-	self.newFN = self.expName + "_" + self.expSrc
-	self.oldFN = fcs.f.Name()
 
-	self.expName = self.expDate + " " + self.expName
+	self.expDate = fcs.txtDict["DATE"]
+	convertDate(&self.expDate) //Coverts date to a better string format
+
+	self.newFN = self.expName + "_" + self.expSrc + "_" + self.expTube + ".fcs"
+	self.cleanName(&self.newFN, true)
+
 	self.filePath = SEP + self.expUser + SEP + self.expName + SEP + self.expSrc
+	self.expName = self.expDate + " " + self.expName
 
-	fmt.Println(self.expDate)
+}
+func (self *FCSInfo) cleanName(s *string, isFile bool) {
+
+	if isFile == true {
+		*s = strings.Replace(*s, "/", "-", -1)
+		*s = strings.Replace(*s, "\\", "-", -1)
+	}
 
 }
 
@@ -155,6 +187,7 @@ func (self *Path) SetPath(src string, des string) {
 func (self *Path) GlobIt() []string {
 	os.Chdir(self.srcPath)
 	f, err := filepath.Glob("*.fcs")
+
 	check(err)
 
 	return f
@@ -163,6 +196,9 @@ func (self *Path) GlobIt() []string {
 
 func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 	os.MkdirAll(self.desPath+fcsInfo.filePath, 0777)
+	cwd, _ := os.Getwd()
+	fmt.Println(cp(filepath.Join(cwd, fcsInfo.oldFN), filepath.Join(self.desPath, fcsInfo.filePath, fcsInfo.newFN)))
+
 }
 
 func main() {
