@@ -53,6 +53,7 @@ func (self *FCSFile) readTextSegment(f *os.File) {
 	//Stores the content of the TEXT Segment after reading
 	txtContent := self.readBytes(f, int64(txtSize), int64(self.txtStart))
 
+	//Data from TEXT segment contained in continous array
 	pairs := strings.Split(txtContent, string(12))
 
 	self.txtDict = map[string]string{}
@@ -61,8 +62,8 @@ func (self *FCSFile) readTextSegment(f *os.File) {
 	for i := 1; i < len(pairs); i = i + 2 {
 
 		x, y := pairs[i-1], pairs[i]
-		self.removeChar(&x, true)  //Take away any $ or spaces
-		self.removeChar(&y, false) //Trims values of space characters
+		self.cleanString(&x, true)  //Take away any $ or spaces from keys
+		self.cleanString(&y, false) //Trims spaces from values
 		self.txtDict[x] = y
 
 	}
@@ -72,25 +73,25 @@ func (self *FCSFile) readTextSegment(f *os.File) {
 }
 
 //Removes $ (replaced with "") and spaces from string (replaced with "_") for
-//only keys (key == true). All strings are Trimed
-func (self *FCSFile) removeChar(s *string, key bool) {
+//only keys (key == true). All strings are trimed
+func (self *FCSFile) cleanString(s *string, key bool) {
 
 	if key == true {
 		*s = strings.Replace(*s, "$", "", -1)
 		*s = strings.Replace(*s, " ", "_", -1)
 	}
 
-	*s = strings.TrimSpace(*s)
+	*s = strings.TrimSpace(*s) //Trims whitespace
 
 }
 
-//Reads a partiuclar size of bytes (byteSize) starting at a certain part of the file (f)
+//Reads a particular size of bytes (byteSize) starting at a certain part of the file (f)
 // (offset).  Returns a cleaned string value.
 func (self *FCSFile) readBytes(f *os.File, byteSize int64, offset int64) string {
 
 	readBytes := make([]byte, byteSize)
 	f.ReadAt(readBytes, offset)
-	byteValue := strings.TrimSpace(string(readBytes))
+	byteValue := strings.TrimSpace(string(readBytes)) //Bytes into string conversion
 
 	return byteValue
 
