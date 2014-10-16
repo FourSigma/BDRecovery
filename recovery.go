@@ -31,8 +31,7 @@ func convertDate(date *string) {
 
 }
 
-//Copy files
-
+//Copies from a source file to a new files (des) 
 func cp(src, dst string) error {
 	s, err := os.Open(src)
 	if err != nil {
@@ -208,7 +207,8 @@ func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 
 }
 /*****************************************************************************
-**   This is the END of the Path defintion and methods.					**
+**   This is the END of the Path
+ defintion and methods.					**
 ******************************************************************************/
 
 func main() {
