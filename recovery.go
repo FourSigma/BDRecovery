@@ -152,7 +152,7 @@ func (self *FCSInfo) InitFCSInfo(fcs *FCSFile) {
 	self.expName = fcs.txtDict["EXPERIMENT_NAME"]
 	self.expTube = fcs.txtDict["TUBE_NAME"]
 	self.oldFN = fcs.f.Name()
-	self.expSrc = fcs.txtDict["SRC"]
+	git self.expSrc = fcs.txtDict["SRC"]
 	self.expUser = fcs.txtDict["EXPORT_USER_NAME"]
 
 	self.expDate = fcs.txtDict["DATE"]
@@ -165,6 +165,8 @@ func (self *FCSInfo) InitFCSInfo(fcs *FCSFile) {
 	self.expName = self.expDate + " " + self.expName
 
 }
+//Cleans file names of "/" and "\" characters that might 
+//interfer with output.
 func (self *FCSInfo) cleanName(s *string, isFile bool) {
 
 	if isFile == true {
@@ -173,17 +175,22 @@ func (self *FCSInfo) cleanName(s *string, isFile bool) {
 	}
 
 }
-
+/*****************************************************************************
+**   This is the END of the FCSInfo defintion and methods.					**
+******************************************************************************/
 type Path struct {
 	srcPath string //Source Path - This is where the BDData file is located
 	desPath string //Destination Path - Where the recovered files will be placed
 }
 
+//Set the path of the BDData directory and the destiantion  of the recovered files.
 func (self *Path) SetPath(src string, des string) {
 	self.srcPath = src
 	self.desPath = des
 }
 
+//Reads the the names of all *.fcs files and puts them in 
+//a slice and returns the slice.
 func (self *Path) GlobIt() []string {
 	os.Chdir(self.srcPath)
 	f, err := filepath.Glob("*.fcs")
@@ -193,13 +200,16 @@ func (self *Path) GlobIt() []string {
 	return f
 
 }
-
+//Copies files and moves them to the desination directory.
 func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 	os.MkdirAll(self.desPath+fcsInfo.filePath, 0777)
 	cwd, _ := os.Getwd()
 	fmt.Println(cp(filepath.Join(cwd, fcsInfo.oldFN), filepath.Join(self.desPath, fcsInfo.filePath, fcsInfo.newFN)))
 
 }
+/*****************************************************************************
+**   This is the END of the Path defintion and methods.					**
+******************************************************************************/
 
 func main() {
 
