@@ -189,7 +189,7 @@ func (self *FCSInfo) InitFCSInfo(fcs *FCSFile) {
 	self.newFN = self.expName + "_" + self.expSrc + "_" + self.expTube + ".fcs"
 	self.cleanName(&self.newFN, true)
 
-	self.filePath = SEP + self.expUser + SEP + self.expName + SEP + self.expSrc
+	self.filePath = SEP + self.expUser + SEP + self.expDate + " " + self.expName + SEP + self.expSrc
 	self.expName = self.expDate + " " + self.expName
 
 }
