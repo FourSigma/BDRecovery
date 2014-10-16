@@ -31,7 +31,7 @@ func convertDate(date *string) {
 
 }
 
-//Copies from a source file to a new files (des) 
+//Copies from a source file to a new files (des)
 func cp(src, dst string) error {
 	s, err := os.Open(src)
 	if err != nil {
@@ -151,7 +151,7 @@ func (self *FCSInfo) InitFCSInfo(fcs *FCSFile) {
 	self.expName = fcs.txtDict["EXPERIMENT_NAME"]
 	self.expTube = fcs.txtDict["TUBE_NAME"]
 	self.oldFN = fcs.f.Name()
-	git self.expSrc = fcs.txtDict["SRC"]
+	self.expSrc = fcs.txtDict["SRC"]
 	self.expUser = fcs.txtDict["EXPORT_USER_NAME"]
 
 	self.expDate = fcs.txtDict["DATE"]
@@ -164,7 +164,8 @@ func (self *FCSInfo) InitFCSInfo(fcs *FCSFile) {
 	self.expName = self.expDate + " " + self.expName
 
 }
-//Cleans file names of "/" and "\" characters that might 
+
+//Cleans file names of "/" and "\" characters that might
 //interfer with output.
 func (self *FCSInfo) cleanName(s *string, isFile bool) {
 
@@ -174,6 +175,7 @@ func (self *FCSInfo) cleanName(s *string, isFile bool) {
 	}
 
 }
+
 /*****************************************************************************
 **   This is the END of the FCSInfo defintion and methods.					**
 ******************************************************************************/
@@ -188,7 +190,7 @@ func (self *Path) SetPath(src string, des string) {
 	self.desPath = des
 }
 
-//Reads the the names of all *.fcs files and puts them in 
+//Reads the the names of all *.fcs files and puts them in
 //a slice and returns the slice.
 func (self *Path) GlobIt() []string {
 	os.Chdir(self.srcPath)
@@ -199,6 +201,7 @@ func (self *Path) GlobIt() []string {
 	return f
 
 }
+
 //Copies files and moves them to the desination directory.
 func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 	os.MkdirAll(self.desPath+fcsInfo.filePath, 0777)
@@ -206,6 +209,7 @@ func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 	fmt.Println(cp(filepath.Join(cwd, fcsInfo.oldFN), filepath.Join(self.desPath, fcsInfo.filePath, fcsInfo.newFN)))
 
 }
+
 /*****************************************************************************
 **   This is the END of the Path
  defintion and methods.					**
