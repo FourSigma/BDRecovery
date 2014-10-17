@@ -256,6 +256,10 @@ func main() {
 	var src = flag.String("src", "", "Location of BDData Directory")
 	var des = flag.String("des", "", "Location where recoverd files will be stored")
 	flag.Parse()
+	if *src == "" || *des == "" {
+		fmt.Println("Usage: recovery -src <BDData Dir> -des <Recovery Dir> ")
+	}
+
 	//Creates a new path struct to hold destination and source
 	paths := &Path{}
 	paths.SetPath(*src, *des)
