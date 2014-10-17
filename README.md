@@ -7,6 +7,19 @@ corrupt.  This tool allow you  to recover the files
 in the BD Data folder and put them into folders by
 /User/Experiment/Specimen 
 
+##Binaries
+Binaries for MacOS(64 bit), Windows(64 bit) and WindowsXP(32 bit) are in the ```/bin``` folder. 
+
++ Usage:  ```recovery -src BDData Dir -des Backup Dir ``` 
++ Example in MacOS:  ```recovery -src /Users/JDoe/BDdata -des /
+
+##Compiling from source
+Make sure you have [Go](golang.org) installed on your system.
+
++ Building:  ```go build recovery.go```
+Users/JDoe/RecoveredFCS```
+
+
 ##Before Recovery 
 ![Before Recovery](./img/before.jpg)
 
@@ -14,9 +27,4 @@ in the BD Data folder and put them into folders by
 ![After Recovery](./img/after.jpg)
 
 
-##Compiling from source
-Make sure you have [Go](golang.org) installed on your system.
 
-+ Building:  ```go build recovery.go```
-+ Usage:  ```recovery -src BDData Dir -des Backup Dir ```
-+ Example in MacOS:  ```recovery -src /Users/JDoe/BDdata -des /Users/JDoe/RecoveredFCS```
