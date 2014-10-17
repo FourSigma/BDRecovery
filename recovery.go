@@ -65,6 +65,7 @@ func convertDate(date *string) {
 func cp(src, dst string) error {
 	s, err := os.Open(src)
 	if err != nil {
+		fmt.Println("Can't open %s\n", src)
 		return err
 	}
 	// no need to check errors on read only file, we already got everything
@@ -72,10 +73,12 @@ func cp(src, dst string) error {
 	defer s.Close()
 	d, err := os.Create(dst)
 	if err != nil {
+		fmt.Println("Can't write to destination: %s", dst)
 		return err
 	}
 	if _, err := io.Copy(d, s); err != nil {
 		d.Close()
+		fmt.Println("Can't copy file to desination: %s", src)
 		return err
 	}
 	return d.Close()
@@ -249,17 +252,21 @@ func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 
 func main() {
 
+	//Command line praser init
 	var src = flag.String("src", "", "Location of BDData Directory")
 	var des = flag.String("des", "", "Location where recoverd files will be stored")
 	flag.Parse()
-
+	//Creates a new path struct to hold destination and source
 	paths := &Path{}
 	paths.SetPath(*src, *des)
 	files := paths.GlobIt()
 
+	//Init for FCSFile - reads the TEXT header
+	//Init for FCSInto - stores relevant info from TEXT header
 	newFile := &FCSFile{}
 	fileInfo := &FCSInfo{}
 
+	//Loops through the files in the source directory.
 	for _, fileName := range files {
 
 		newFile.InitFCS(fileName)
