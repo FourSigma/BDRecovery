@@ -7,9 +7,13 @@ corrupt.  This tool allow you  to recover the files
 in the BD Data folder and put them into folders by
 /User/Experiment/Specimen 
 
+![Before Recovery](./img/before.jpg)
+![After Recovery](./img/after.jpg)
+
 
 ##Compiling from source
+Make sure you have [Go](golang.org) installed on your system.
 
-Usage:  <pre><code>go build recovery.go</code></pre>
-Command Line:   <pre><code>recovery -src BDData Dir -des Backup Dir </code></pre>
-Example in MacOS:  <pre><code>recovery -src /Users/JDoe/BDdata -des /Users/JDoe/RecoveredFCS<pre><code>
+Usage:  ````go build recovery.go```
+Command Line:  ````recovery -src BDData Dir -des Backup Dir ```
+Example in MacOS:  ```recovery -src /Users/JDoe/BDdata -des /Users/JDoe/RecoveredFCS```
