@@ -241,7 +241,7 @@ func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 	cwd, _ := os.Getwd()
 	err := cp(filepath.Join(cwd, fcsInfo.oldFN), filepath.Join(self.desPath, fcsInfo.filePath, fcsInfo.newFN))
 	if err == nil {
-		fmt.Println(fcsInfo.oldFN + "   ------>" + fcsInfo.newFN)
+		fmt.Println(fcsInfo.oldFN + "   ------>  " + fcsInfo.newFN)
 	}
 }
 
