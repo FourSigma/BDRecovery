@@ -8,15 +8,15 @@ in the BD Data folder and put them into folders by
 /User/Experiment/Specimen 
 
 ##Before Recovery 
-![Before Recovery](./img/before.jpg = 200px)
+![Before Recovery](./img/before.jpg=200px)
 
 ##After Recovery
-![After Recovery](./img/after.jpg = 200px)
+![After Recovery](./img/after.jpg=200px)
 
 
 ##Compiling from source
 Make sure you have [Go](golang.org) installed on your system.
 
-+Usage:  ```go build recovery.go```
-+Command Line:  ```recovery -src BDData Dir -des Backup Dir ```
-+Example in MacOS:  ```recovery -src /Users/JDoe/BDdata -des /Users/JDoe/RecoveredFCS```
++ Usage:  ```go build recovery.go```
++ Command Line:  ```recovery -src BDData Dir -des Backup Dir ```
++ Example in MacOS:  ```recovery -src /Users/JDoe/BDdata -des /Users/JDoe/RecoveredFCS```
