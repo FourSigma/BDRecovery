@@ -30,6 +30,7 @@ Example in MacOS:  recovery -src /Users/JDoe/BDdata -des /Users/JDoe/RecoveredFC
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -235,8 +236,10 @@ func (self *Path) GlobIt() []string {
 func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 	os.MkdirAll(self.desPath+fcsInfo.filePath, 0777)
 	cwd, _ := os.Getwd()
-	fmt.Println(cp(filepath.Join(cwd, fcsInfo.oldFN), filepath.Join(self.desPath, fcsInfo.filePath, fcsInfo.newFN)))
-
+	err := cp(filepath.Join(cwd, fcsInfo.oldFN), filepath.Join(self.desPath, fcsInfo.filePath, fcsInfo.newFN))
+	if err == nil {
+		fmt.Println(fcsInfo.oldFN + "   ------>" + fcsInfo.newFN)
+	}
 }
 
 /*****************************************************************************
@@ -246,8 +249,12 @@ func (self *Path) RenameMove(fcsInfo *FCSInfo) {
 
 func main() {
 
+	var src = flag.String("src", "", "Location of BDData Directory")
+	var des = flag.String("des", "", "Location where recoverd files will be stored")
+	flag.Parse()
+
 	paths := &Path{}
-	paths.SetPath("/Users/sivabalanmanivannan/Desktop/BDData", "/Users/sivabalanmanivannan/TempData")
+	paths.SetPath(*src, *des)
 	files := paths.GlobIt()
 
 	newFile := &FCSFile{}
