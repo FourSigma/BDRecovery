@@ -10,11 +10,11 @@ in the BD Data folder and put them into folders by
 ##Binaries
 Binaries for MacOS(64 bit), Windows(64 bit) and WindowsXP(32 bit) are in the ```/bin``` folder. 
 
-+ Usage:  ```./recovery -src BDData Dir -des Backup Dir ``` 
++ Usage:  ```recovery -src BDData Dir -des Backup Dir ``` 
 + Example in MacOS:  ```recovery -src /Users/JDoe/BDdata -des /Users/JDoe/RecoveredFCS```
 
 ##Important
-I found the best way to do this recovery is to copy the BDData folder from your cytometer's computer to your personal computer.
+I found the best way to do this recovery is to copy the BDData folder from your cytometer's computer to your personal computer.  Download the binary corresponding to your personal computer (Mac, Windows, WindowsXP) and execute in the terminal. 
 
 **Make sure you have enough space for the BDData directory AND recovered files**  Otherwise you will get a program error.  
 
