@@ -1,5 +1,5 @@
 # BDRecovery (Flow Cytometry)
-######Recovery of FCS files in the BDData
+######Recovery of FCS files in the BDData directory
 
 If you don’t regularly backup your database
 when using BD FACS Diva your database might go 
